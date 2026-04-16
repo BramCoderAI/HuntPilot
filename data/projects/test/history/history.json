@@ -1,0 +1,370 @@
+[
+  {
+    "entry_id": "b4ce4484-1ae6-418c-b45f-b6a9ebed56b3",
+    "created_at": "2026-04-16T23:19:21",
+    "updated_at": "2026-04-16T23:46:54",
+    "request_raw": "PATCH /api/users/123?account_id=456 HTTP/1.1\nHost: example.com\nAuthorization: Bearer token123\nCookie: sessionid=abc123; theme=dark\nContent-Type: application/json\n\n{\"user_id\":123,\"role\":\"admin\",\"email\":\"test@example.com\",\"status\":\"active\",\"plan\":\"pro\"}",
+    "response_raw": "HTTP/1.1 403 Forbidden\nContent-Type: application/json\nContent-Length: 97\n\n{\"error\":\"forbidden\",\"message\":\"You are not allowed to modify this user\",\"code\":\"AUTH_403\"}",
+    "request_method": "PATCH",
+    "request_path": "/api/users/123",
+    "response_status": 403,
+    "overall_risk": "high",
+    "top_issue_titles": [
+      "Potential object-level authorization weakness",
+      "Request body may allow unsafe field binding",
+      "Client-controlled privilege fields detected"
+    ],
+    "is_favorite": false,
+    "analyst_note": "",
+    "tags": [],
+    "suggested_tags": [
+      "idor",
+      "test-first",
+      "high-confidence",
+      "mass-assignment",
+      "authz",
+      "validation",
+      "authz-check",
+      "api",
+      "json",
+      "authenticated",
+      "session",
+      "privilege-field",
+      "object-reference",
+      "403",
+      "forbidden",
+      "patch",
+      "risk-high"
+    ],
+    "hit_count": 2,
+    "extraction_data": {
+      "ids": [
+        {
+          "category": "id",
+          "name": "path_identifier",
+          "value": "123",
+          "source": "path"
+        },
+        {
+          "category": "id",
+          "name": "account_id",
+          "value": "456",
+          "source": "query_param"
+        },
+        {
+          "category": "id",
+          "name": "user_id",
+          "value": "123",
+          "source": "json_body"
+        }
+      ],
+      "sensitive_fields": [
+        {
+          "category": "sensitive_field",
+          "name": "account_id",
+          "value": "456",
+          "source": "query_param"
+        },
+        {
+          "category": "sensitive_field",
+          "name": "user_id",
+          "value": "123",
+          "source": "json_body"
+        },
+        {
+          "category": "sensitive_field",
+          "name": "role",
+          "value": "admin",
+          "source": "json_body"
+        },
+        {
+          "category": "sensitive_field",
+          "name": "email",
+          "value": "test@example.com",
+          "source": "json_body"
+        },
+        {
+          "category": "sensitive_field",
+          "name": "status",
+          "value": "active",
+          "source": "json_body"
+        },
+        {
+          "category": "sensitive_field",
+          "name": "plan",
+          "value": "pro",
+          "source": "json_body"
+        }
+      ],
+      "auth_markers": [
+        {
+          "category": "auth",
+          "name": "Authorization",
+          "value": "Bearer token123",
+          "source": "header"
+        }
+      ],
+      "session_markers": [
+        {
+          "category": "session",
+          "name": "sessionid",
+          "value": "abc123",
+          "source": "cookie"
+        }
+      ],
+      "endpoint_markers": [
+        {
+          "category": "endpoint",
+          "name": "api_endpoint",
+          "value": "/api/",
+          "source": "path"
+        }
+      ],
+      "content_markers": [
+        {
+          "category": "content",
+          "name": "json_body",
+          "value": "true",
+          "source": "request_body"
+        }
+      ],
+      "response_markers": [
+        {
+          "category": "response",
+          "name": "status_code",
+          "value": "403",
+          "source": "response"
+        },
+        {
+          "category": "response",
+          "name": "reason_phrase",
+          "value": "Forbidden",
+          "source": "response"
+        },
+        {
+          "category": "response",
+          "name": "json_response",
+          "value": "true",
+          "source": "response"
+        },
+        {
+          "category": "response",
+          "name": "response_content_type",
+          "value": "application/json",
+          "source": "response"
+        },
+        {
+          "category": "response",
+          "name": "response_body_length",
+          "value": "91",
+          "source": "response"
+        },
+        {
+          "category": "response",
+          "name": "auth_error",
+          "value": "forbidden",
+          "source": "response_body"
+        },
+        {
+          "category": "response",
+          "name": "permission_error",
+          "value": "not allowed",
+          "source": "response_body"
+        }
+      ]
+    },
+    "scored_analysis_data": {
+      "signals": [
+        {
+          "name": "multiple_user_reference_points",
+          "description": "The request contains both a path identifier and user/account-related references.",
+          "severity": "high",
+          "evidence": [
+            "path:path_identifier=123",
+            "query_param:account_id=456",
+            "json_body:user_id=123",
+            "query_param:account_id=456",
+            "json_body:user_id=123",
+            "json_body:email=test@example.com"
+          ]
+        },
+        {
+          "name": "privilege_related_fields_in_request",
+          "description": "The request contains role or permission-related fields.",
+          "severity": "high",
+          "evidence": [
+            "json_body:role=admin"
+          ]
+        },
+        {
+          "name": "broad_client_supplied_object",
+          "description": "The request body contains many client-controlled fields including sensitive-looking ones.",
+          "severity": "high",
+          "evidence": [
+            "json_leaf_fields=5",
+            "json_body:user_id=123",
+            "json_body:role=admin",
+            "json_body:email=test@example.com",
+            "json_body:status=active",
+            "json_body:plan=pro"
+          ]
+        },
+        {
+          "name": "client_controls_business_fields",
+          "description": "The request body or parameters contain business-critical fields controlled by the client.",
+          "severity": "medium",
+          "evidence": [
+            "json_body:status=active",
+            "json_body:plan=pro",
+            "query_param:account_id=456",
+            "json_body:user_id=123",
+            "json_body:email=test@example.com"
+          ]
+        },
+        {
+          "name": "authorization_response_detected",
+          "description": "The response clearly indicates an authorization or authentication barrier.",
+          "severity": "medium",
+          "evidence": [
+            "response:status_code=403",
+            "response:reason_phrase=Forbidden",
+            "response_body:auth_error=forbidden",
+            "response_body:permission_error=not allowed"
+          ]
+        }
+      ],
+      "hypotheses": [
+        {
+          "issue_type": "BOLA / IDOR",
+          "title": "Potential object-level authorization weakness",
+          "description": "The request appears to act on a resource identified in the path while also carrying user or account references in parameters or body fields.",
+          "rationale": "When a request contains multiple user or object reference points, inconsistent authorization checks can allow access to another user's object.",
+          "confidence": "high",
+          "priority": "test first",
+          "recommended_tests": [
+            "Change the identifier in the path to another test object you are authorized to use.",
+            "Change the body or query identifier independently from the path identifier and compare behavior.",
+            "Compare status code, response size, and returned fields between authorized and altered requests.",
+            "Check whether read, update, or delete behavior changes across different owned test objects."
+          ],
+          "evidence": [
+            "path:path_identifier=123",
+            "query_param:account_id=456",
+            "json_body:user_id=123",
+            "query_param:account_id=456",
+            "json_body:user_id=123",
+            "json_body:email=test@example.com"
+          ],
+          "impact": "high",
+          "effort": "medium",
+          "score": 260
+        },
+        {
+          "issue_type": "Mass Assignment",
+          "title": "Request body may allow unsafe field binding",
+          "description": "The request includes a broad object with multiple client-controlled fields and at least one sensitive field.",
+          "rationale": "Backends that bind whole objects directly from client input can accidentally allow protected fields to be modified.",
+          "confidence": "high",
+          "priority": "test first",
+          "recommended_tests": [
+            "Add fields that are not exposed in the UI, such as role, status, owner_id, or internal flags.",
+            "Remove optional fields one by one and observe which fields the backend truly requires.",
+            "Inject likely server-side model fields and compare whether they are ignored, rejected, or persisted.",
+            "Check whether sensitive fields can be modified even when the frontend normally hides them."
+          ],
+          "evidence": [
+            "json_leaf_fields=5",
+            "json_body:user_id=123",
+            "json_body:role=admin",
+            "json_body:email=test@example.com",
+            "json_body:status=active",
+            "json_body:plan=pro"
+          ],
+          "impact": "high",
+          "effort": "medium",
+          "score": 260
+        },
+        {
+          "issue_type": "Privilege Escalation",
+          "title": "Client-controlled privilege fields detected",
+          "description": "The request includes fields that may influence authorization or privilege level.",
+          "rationale": "If the backend trusts role or permission fields sent by the client, an attacker may be able to raise privileges or alter access level.",
+          "confidence": "high",
+          "priority": "test first",
+          "recommended_tests": [
+            "Modify role, permission, or admin-related fields to stronger values and compare the response.",
+            "Add privilege-related fields not present in the normal UI and see whether they are accepted.",
+            "Check whether the change persists on subsequent reads or affects accessible features.",
+            "Compare behavior using different test accounts with different legitimate roles."
+          ],
+          "evidence": [
+            "json_body:role=admin"
+          ],
+          "impact": "high",
+          "effort": "medium",
+          "score": 250
+        },
+        {
+          "issue_type": "Missing Server-Side Validation",
+          "title": "Business-critical fields should be validated server-side",
+          "description": "The client appears able to send account, workflow, or lifecycle fields directly.",
+          "rationale": "Fields such as status, owner, plan, account references, or subscription values often require strict backend validation and authorization.",
+          "confidence": "medium",
+          "priority": "worth checking",
+          "recommended_tests": [
+            "Send invalid, unexpected, or out-of-sequence values for workflow fields such as status or plan.",
+            "Attempt transitions that should not be allowed at the current step.",
+            "Provide another authorized test account reference and verify whether the backend enforces ownership.",
+            "Check whether the server rejects invalid enum values or silently normalizes them."
+          ],
+          "evidence": [
+            "json_body:status=active",
+            "json_body:plan=pro",
+            "query_param:account_id=456",
+            "json_body:user_id=123",
+            "json_body:email=test@example.com"
+          ],
+          "impact": "medium",
+          "effort": "low",
+          "score": 195
+        },
+        {
+          "issue_type": "Authorization Behavior",
+          "title": "Authorization barrier confirmed by response",
+          "description": "The server is explicitly rejecting the request with an authorization-related response.",
+          "rationale": "A 401 or 403 confirms a server-side check exists, which is useful for mapping trust boundaries and testing whether related endpoints enforce the same control consistently.",
+          "confidence": "medium",
+          "priority": "worth checking",
+          "recommended_tests": [
+            "Compare this endpoint with similar endpoints handling the same object type.",
+            "Change one identifier at a time and verify whether all variants still trigger the same control.",
+            "Check whether read and write operations enforce the same restriction consistently.",
+            "Look for adjacent endpoints where the same authorization rule may be missing."
+          ],
+          "evidence": [
+            "response:status_code=403",
+            "response:reason_phrase=Forbidden",
+            "response_body:auth_error=forbidden",
+            "response_body:permission_error=not allowed"
+          ],
+          "impact": "medium",
+          "effort": "low",
+          "score": 195
+        }
+      ],
+      "summary": {
+        "total_signals": 5,
+        "total_hypotheses": 5,
+        "high_confidence_count": 3,
+        "test_first_count": 3,
+        "top_issue_titles": [
+          "Potential object-level authorization weakness",
+          "Request body may allow unsafe field binding",
+          "Client-controlled privilege fields detected"
+        ],
+        "overall_risk": "high",
+        "analyst_note": "Focus on 'Potential object-level authorization weakness' first. The current exchange shows strong indicators that justify immediate manual verification."
+      }
+    }
+  }
+]
